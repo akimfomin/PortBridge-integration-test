@@ -19,31 +19,38 @@ jobs:
     steps:
       - id: normal
         name: Read public prior work
-        uses: akimfomin/PortBridge@2137b3b045f7ab821b06fa3ff62305dbb0198fc0
+        uses: akimfomin/PortBridge@7642d8288a03d66602db4735b23c1c92071a9ec7
         continue-on-error: true
         with:
           pull-request-url: ${{ inputs.pull_request_url || '' }}
       - name: Exercise an unavailable public catalog
         id: outage
-        uses: akimfomin/PortBridge@2137b3b045f7ab821b06fa3ff62305dbb0198fc0
+        uses: akimfomin/PortBridge@7642d8288a03d66602db4735b23c1c92071a9ec7
         continue-on-error: true
         env:
           https_proxy: http://127.0.0.1:1
           no_proxy: ''
       - name: Recover on a pinned public reference case
         id: recovery
-        uses: akimfomin/PortBridge@2137b3b045f7ab821b06fa3ff62305dbb0198fc0
+        uses: akimfomin/PortBridge@7642d8288a03d66602db4735b23c1c92071a9ec7
         continue-on-error: true
         with:
           pull-request-url: https://github.com/xcl-dev/xcl/pull/2322
+      - id: missing
+        name: Nonexistent public PR
+        uses: akimfomin/PortBridge@7642d8288a03d66602db4735b23c1c92071a9ec7
+        with:
+          pull-request-url: https://github.com/akimfomin/PortBridge-integration-test/pull/999999999
       - name: Check fail-open outcomes and normal review continuation
         shell: bash
         env:
           NORMAL: ${{ steps.normal.outputs.status }}
           OUTAGE: ${{ steps.outage.outputs.status }}
+          MISSING: ${{ steps.missing.outputs.status }}
           RECOVERED: ${{ steps.recovery.outputs.status }}
         run: |
           printf 'receiver=%s outage=%s recovery=%s\n' "$NORMAL" "$OUTAGE" "$RECOVERED"
+          test "$MISSING" = origin_missing
           test "$NORMAL" = reported
           test "$OUTAGE" = unavailable
           test "$RECOVERED" = reported
