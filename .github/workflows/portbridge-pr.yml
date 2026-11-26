@@ -1,0 +1,24 @@
+name: Optional PortBridge prior work
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  workflow_dispatch:
+    inputs:
+      pull_request_url:
+        description: Public GitHub pull request URL
+        required: true
+        type: string
+permissions: {}
+concurrency:
+  group: portbridge-pr-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+jobs:
+  prior-work:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Read public prior work
+        uses: akimfomin/PortBridge@0cb1fe46d14f0930e7e347e3c9980a53c9d94be9
+        continue-on-error: true
+        with:
+          pull-request-url: ${{ inputs.pull_request_url || '' }}
