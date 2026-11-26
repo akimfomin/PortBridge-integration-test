@@ -29,9 +29,7 @@ jobs:
         continue-on-error: true
         env:
           https_proxy: http://127.0.0.1:1
-          HTTPS_PROXY: http://127.0.0.1:1
           no_proxy: ''
-          NO_PROXY: ''
       - name: Recover on a pinned public reference case
         id: recovery
         uses: akimfomin/PortBridge@2137b3b045f7ab821b06fa3ff62305dbb0198fc0
