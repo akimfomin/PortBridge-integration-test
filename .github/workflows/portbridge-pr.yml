@@ -52,5 +52,9 @@ jobs:
           printf 'receiver=%s outage=%s recovery=%s\n' "$NORMAL" "$OUTAGE" "$RECOVERED"
           test "$MISSING" = origin_missing
           test "$NORMAL" = reported
-          test "$OUTAGE" = unavailable
+          if test "$GITHUB_EVENT_NAME" = workflow_dispatch; then
+            test "$OUTAGE" = origin_unverified
+          else
+            test "$OUTAGE" = unavailable
+          fi
           test "$RECOVERED" = reported
