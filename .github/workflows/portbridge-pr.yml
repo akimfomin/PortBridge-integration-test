@@ -17,8 +17,35 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - name: Read public prior work
-        uses: akimfomin/PortBridge@0cb1fe46d14f0930e7e347e3c9980a53c9d94be9
+      - id: normal
+        name: Read public prior work
+        uses: akimfomin/PortBridge@2137b3b045f7ab821b06fa3ff62305dbb0198fc0
         continue-on-error: true
         with:
           pull-request-url: ${{ inputs.pull_request_url || '' }}
+      - name: Exercise an unavailable public catalog
+        id: outage
+        uses: akimfomin/PortBridge@2137b3b045f7ab821b06fa3ff62305dbb0198fc0
+        continue-on-error: true
+        env:
+          https_proxy: http://127.0.0.1:1
+          HTTPS_PROXY: http://127.0.0.1:1
+          no_proxy: ''
+          NO_PROXY: ''
+      - name: Recover on a pinned public reference case
+        id: recovery
+        uses: akimfomin/PortBridge@2137b3b045f7ab821b06fa3ff62305dbb0198fc0
+        continue-on-error: true
+        with:
+          pull-request-url: https://github.com/xcl-dev/xcl/pull/2322
+      - name: Check fail-open outcomes and normal review continuation
+        shell: bash
+        env:
+          NORMAL: ${{ steps.normal.outputs.status }}
+          OUTAGE: ${{ steps.outage.outputs.status }}
+          RECOVERED: ${{ steps.recovery.outputs.status }}
+        run: |
+          printf 'receiver=%s outage=%s recovery=%s\n' "$NORMAL" "$OUTAGE" "$RECOVERED"
+          test "$NORMAL" = reported
+          test "$OUTAGE" = unavailable
+          test "$RECOVERED" = reported
