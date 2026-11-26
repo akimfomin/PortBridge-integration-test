@@ -19,26 +19,26 @@ jobs:
     steps:
       - id: normal
         name: Read public prior work
-        uses: akimfomin/PortBridge@7642d8288a03d66602db4735b23c1c92071a9ec7
+        uses: akimfomin/PortBridge@c8d4efb1a2b362f4cb4606ea794bba579dfab4ed
         continue-on-error: true
         with:
           pull-request-url: ${{ inputs.pull_request_url || '' }}
       - name: Exercise an unavailable public catalog
         id: outage
-        uses: akimfomin/PortBridge@7642d8288a03d66602db4735b23c1c92071a9ec7
+        uses: akimfomin/PortBridge@c8d4efb1a2b362f4cb4606ea794bba579dfab4ed
         continue-on-error: true
         env:
           https_proxy: http://127.0.0.1:1
           no_proxy: ''
       - name: Recover on a pinned public reference case
         id: recovery
-        uses: akimfomin/PortBridge@7642d8288a03d66602db4735b23c1c92071a9ec7
+        uses: akimfomin/PortBridge@c8d4efb1a2b362f4cb4606ea794bba579dfab4ed
         continue-on-error: true
         with:
           pull-request-url: https://github.com/xcl-dev/xcl/pull/2322
       - id: missing
         name: Nonexistent public PR
-        uses: akimfomin/PortBridge@7642d8288a03d66602db4735b23c1c92071a9ec7
+        uses: akimfomin/PortBridge@c8d4efb1a2b362f4cb4606ea794bba579dfab4ed
         with:
           pull-request-url: https://github.com/akimfomin/PortBridge-integration-test/pull/999999999
       - name: Check fail-open outcomes and normal review continuation
